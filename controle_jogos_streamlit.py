@@ -21,7 +21,7 @@ else:
 
 # Mapeamento final corrigido
 consoles_por_plataforma = {
-    "Playstation": ["PS1", "PS2", "PS3", "PS4", "PS5", "PSP", "PS Vita"],
+    "Playstation",
     "Xbox": ["Xbox", "Xbox 360", "Xbox One", "Xbox Series S", "Xbox Series X"],
     "Nintendo": ["NES", "SNES", "Nintendo 64", "GameCube", "Wii", "Wii U", "Switch", "3DS", "DS"],
     "Sega": ["Master System", "Mega Drive", "Saturn", "Dreamcast"],
