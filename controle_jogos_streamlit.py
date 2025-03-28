@@ -41,17 +41,20 @@ with st.form("adicionar_jogo"):
     edicao_opcoes = ["Standard", "Deluxe", "Colecionador", "Outro"]
 
     with col1:
-        plataforma = st.selectbox("Plataforma", plataformas_opcoes)
+        plataforma = st.selectbox("Plataforma", plataformas_opcoes, key="plataforma_select")
         genero = st.selectbox("Gênero", generos_opcoes)
         midia = st.selectbox("Mídia", midia_opcoes)
         condicao = st.text_input("Condição / Observações de coleção")
 
     with col2:
+        # Alteração chave: usar session_state para atualizar os consoles
         opcoes_console = consoles_por_plataforma.get(plataforma, [])
+        
         if opcoes_console:
-            console = st.selectbox("Console", options=opcoes_console, key=f"console_{plataforma}")
+            console = st.selectbox("Console", options=opcoes_console, key=f"console_select")
         else:
             console = st.text_input("Console (escreva manualmente)")
+        
         edicao = st.selectbox("Edição", edicao_opcoes)
         jogo = st.text_input("Nome do Jogo")
         obs_colecao = st.text_area("Observações gerais da mídia")
@@ -77,7 +80,7 @@ with st.form("adicionar_jogo"):
         df = pd.concat([df, novo], ignore_index=True)
         df.to_excel(ARQUIVO, index=False)
         st.success(f"✅ '{jogo}' adicionado à coleção!")
-
+        
 st.markdown("---")
 
 # Seção 2: Editar gameplay
