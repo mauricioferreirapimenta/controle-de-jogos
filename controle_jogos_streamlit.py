@@ -3,7 +3,7 @@ import streamlit as st
 import pandas as pd
 import os
 
-ARQUIVO = "Lista_de_Jogos.xlsx"
+ARQUIVO = "Lista de Jogos_ver1.xlsx"
 
 # Carregar dados
 if os.path.exists(ARQUIVO):
