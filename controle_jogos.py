@@ -20,7 +20,11 @@ colunas = [
 ]
 
 if os.path.exists(ARQUIVO):
-    df = pd.read_excel(ARQUIVO)
+    try:
+        df = pd.read_excel(ARQUIVO)
+    except Exception as e:
+        st.error(f"Erro ao carregar planilha: {e}")
+        df = pd.DataFrame(columns=colunas)
 else:
     df = pd.DataFrame(columns=colunas)
 
@@ -45,6 +49,8 @@ paginas = [
 ]
 pagina = st.sidebar.radio("Ir para", paginas)
 st.sidebar.markdown("---")
+
+st.write("Página selecionada:", pagina)  # DEBUG
 
 # -------------------------------
 # Página: Adicionar Jogo
@@ -77,70 +83,88 @@ if pagina == "➕ Adicionar Jogo":
 # -------------------------------
 elif pagina == "✏️ Editar Jogo":
     st.subheader("✏️ Editar jogo")
-    plataforma = st.selectbox("Plataforma", df["Plataforma"].unique())
-    consoles = df[df["Plataforma"] == plataforma]["Console"].unique()
-    console = st.selectbox("Console", consoles)
-    jogos = df[(df["Plataforma"] == plataforma) & (df["Console"] == console)]["Jogo"].unique()
-    jogo = st.selectbox("Jogo", jogos)
+    if df.empty:
+        st.warning("Nenhum jogo cadastrado para editar.")
+    else:
+        try:
+            plataforma = st.selectbox("Plataforma", df["Plataforma"].unique())
+            consoles = df[df["Plataforma"] == plataforma]["Console"].unique()
+            console = st.selectbox("Console", consoles)
+            jogos = df[(df["Plataforma"] == plataforma) & (df["Console"] == console)]["Jogo"].unique()
+            jogo = st.selectbox("Jogo", jogos)
 
-    idx = df[(df["Plataforma"] == plataforma) & (df["Console"] == console) & (df["Jogo"] == jogo)].index[0]
+            idx = df[(df["Plataforma"] == plataforma) & (df["Console"] == console) & (df["Jogo"] == jogo)].index[0]
 
-    with st.form("form_edicao"):
-        status = st.selectbox("Status", ["", "Jogando", "Zerado", "Parado", "Nunca Joguei"], index=0)
-        nota = st.slider("Nota pessoal", 0, 10, int(df.at[idx, "Nota"] or 0))
-        tempo = st.number_input("Tempo jogado (h)", min_value=0, value=int(df.at[idx, "Tempo (h)"] or 0))
-        inicio = st.date_input("Data de início", value=date.today())
-        fim = st.date_input("Data de fim", value=date.today())
-        comentarios = st.text_area("Comentários pessoais")
-        editar = st.form_submit_button("Salvar alterações")
+            with st.form("form_edicao"):
+                status = st.selectbox("Status", ["", "Jogando", "Zerado", "Parado", "Nunca Joguei"], index=0)
+                nota = st.slider("Nota pessoal", 0, 10, int(df.at[idx, "Nota"] or 0))
+                tempo = st.number_input("Tempo jogado (h)", min_value=0, value=int(df.at[idx, "Tempo (h)"] or 0))
+                inicio = st.date_input("Data de início", value=date.today())
+                fim = st.date_input("Data de fim", value=date.today())
+                comentarios = st.text_area("Comentários pessoais")
+                editar = st.form_submit_button("Salvar alterações")
 
-    if editar:
-        df.at[idx, "Status"] = status
-        df.at[idx, "Nota"] = nota
-        df.at[idx, "Tempo (h)"] = tempo
-        df.at[idx, "Início"] = inicio
-        df.at[idx, "Fim"] = fim
-        df.at[idx, "Comentários pessoais"] = comentarios
-        df.to_excel(ARQUIVO, index=False)
-        st.success("Informações atualizadas com sucesso!")
+            if editar:
+                df.at[idx, "Status"] = status
+                df.at[idx, "Nota"] = nota
+                df.at[idx, "Tempo (h)"] = tempo
+                df.at[idx, "Início"] = inicio
+                df.at[idx, "Fim"] = fim
+                df.at[idx, "Comentários pessoais"] = comentarios
+                df.to_excel(ARQUIVO, index=False)
+                st.success("Informações atualizadas com sucesso!")
+        except Exception as e:
+            st.error(f"Erro ao editar jogo: {e}")
 
 # -------------------------------
 # Página: Excluir Jogo
 # -------------------------------
 elif pagina == "🗑️ Excluir Jogo":
     st.subheader("🗑️ Excluir jogo")
-    plataforma = st.selectbox("Plataforma", df["Plataforma"].unique())
-    consoles = df[df["Plataforma"] == plataforma]["Console"].unique()
-    console = st.selectbox("Console", consoles)
-    jogos = df[(df["Plataforma"] == plataforma) & (df["Console"] == console)]["Jogo"].unique()
-    jogo = st.selectbox("Jogo", jogos)
+    if df.empty:
+        st.warning("Nenhum jogo cadastrado para excluir.")
+    else:
+        try:
+            plataforma = st.selectbox("Plataforma", df["Plataforma"].unique())
+            consoles = df[df["Plataforma"] == plataforma]["Console"].unique()
+            console = st.selectbox("Console", consoles)
+            jogos = df[(df["Plataforma"] == plataforma) & (df["Console"] == console)]["Jogo"].unique()
+            jogo = st.selectbox("Jogo", jogos)
 
-    if st.button("Excluir jogo selecionado"):
-        df = df[~((df["Plataforma"] == plataforma) & (df["Console"] == console) & (df["Jogo"] == jogo))]
-        df.to_excel(ARQUIVO, index=False)
-        st.success(f"Jogo '{jogo}' excluído com sucesso!")
+            if st.button("Excluir jogo selecionado"):
+                df = df[~((df["Plataforma"] == plataforma) & (df["Console"] == console) & (df["Jogo"] == jogo))]
+                df.to_excel(ARQUIVO, index=False)
+                st.success(f"Jogo '{jogo}' excluído com sucesso!")
+        except Exception as e:
+            st.error(f"Erro ao excluir jogo: {e}")
 
 # -------------------------------
 # Página: Navegar por Plataforma
 # -------------------------------
 elif pagina == "📁 Navegar por Plataforma":
     st.subheader("📁 Minha Coleção por Plataforma e Console")
-    plataformas = df["Plataforma"].value_counts()
-    for plat in plataformas.index:
-        with st.expander(f"{plat} ({plataformas[plat]})"):
-            subset = df[df["Plataforma"] == plat]
-            consoles = subset["Console"].value_counts()
-            for con in consoles.index:
-                st.markdown(f"**🎮 {con}** ({consoles[con]})")
-                st.dataframe(subset[subset["Console"] == con][["Jogo", "Gênero", "Status", "Nota"]])
+    if df.empty:
+        st.info("Nenhum jogo adicionado ainda.")
+    else:
+        plataformas = df["Plataforma"].value_counts()
+        for plat in plataformas.index:
+            with st.expander(f"{plat} ({plataformas[plat]})"):
+                subset = df[df["Plataforma"] == plat]
+                consoles = subset["Console"].value_counts()
+                for con in consoles.index:
+                    st.markdown(f"**🎮 {con}** ({consoles[con]})")
+                    st.dataframe(subset[subset["Console"] == con][["Jogo", "Gênero", "Status", "Nota"]])
 
 # -------------------------------
 # Página: Lista Completa
 # -------------------------------
 elif pagina == "📋 Lista Completa":
     st.subheader("📋 Lista completa de jogos")
-    df_ordenado = df.sort_values(by=["Plataforma", "Console", "Jogo"])
-    st.dataframe(df_ordenado)
+    if df.empty:
+        st.info("Nenhum jogo registrado ainda.")
+    else:
+        df_ordenado = df.sort_values(by=["Plataforma", "Console", "Jogo"])
+        st.dataframe(df_ordenado)
 
 # -------------------------------
 # Página: Backup e Importação
@@ -153,6 +177,9 @@ elif pagina == "📁 Backup e Importação":
 
     arquivo = st.file_uploader("📤 Importar nova planilha", type=["xlsx"])
     if arquivo:
-        df = pd.read_excel(arquivo)
-        df.to_excel(ARQUIVO, index=False)
-        st.success("Planilha importada com sucesso!")
+        try:
+            df = pd.read_excel(arquivo)
+            df.to_excel(ARQUIVO, index=False)
+            st.success("Planilha importada com sucesso!")
+        except Exception as e:
+            st.error(f"Erro ao importar: {e}")
