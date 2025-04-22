@@ -107,7 +107,12 @@ if pagina == "✏️ Editar Jogo":
                 midia = st.selectbox("Mídia", ["", "Física", "Digital", "Outro"], index=["", "Física", "Digital", "Outro"].index(str(df.at[idx, "Mídia"])) if str(df.at[idx, "Mídia"]) in ["", "Física", "Digital", "Outro"] else 0)
                 edicao = st.text_input("Edição", value=str(df.at[idx, "Edição"]))
                 condicao = st.text_area("Condição", value=str(df.at[idx, "Condição"]))
-                data_lancamento = st.date_input("Data de lançamento", value=tratar_data(df.at[idx, "Data de lançamento"]))
+                valor_data = df.at[idx, "Data de lançamento"]
+            if pd.isnull(valor_data) or valor_data == "":
+                valor_data = date.today()
+    else:
+        valor_data = pd.to_datetime(valor_data, errors="coerce").date()
+        data_lancamento = st.date_input("Data de lançamento", value=valor_data)
                 status = st.selectbox("Status", ["", "Jogando", "Zerado", "Parado", "Nunca Joguei"], index=["", "Jogando", "Zerado", "Parado", "Nunca Joguei"].index(str(df.at[idx, "Status"])) if str(df.at[idx, "Status"]) in ["", "Jogando", "Zerado", "Parado", "Nunca Joguei"] else 0)
                 nota = st.slider("Nota", 0, 10, int(df.at[idx, "Nota"]) if pd.notnull(df.at[idx, "Nota"]) else 0)
                 tempo = st.number_input("Tempo (h)", min_value=0, value=int(df.at[idx, "Tempo (h)"]) if pd.notnull(df.at[idx, "Tempo (h)"]) else 0)
