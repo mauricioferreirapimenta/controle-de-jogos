@@ -1,9 +1,3 @@
-# Recriação do código completo com todas as seções e correções aplicadas
-
-full_code_path = Path("/mnt/data/controle_jogos_completo_corrigido_final.py")
-
-with open(full_code_path, "w", encoding="utf-8") as f:
-    f.write("""
 import streamlit as st
 import pandas as pd
 import os
