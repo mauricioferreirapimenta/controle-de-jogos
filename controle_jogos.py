@@ -137,4 +137,37 @@ if pagina == "✏️ Editar Jogo":
                     df.to_excel(ARQUIVO, index=False)
                     st.success("Informações atualizadas com sucesso!")
 
+if pagina == "🗑️ Excluir Jogo":
+    st.subheader("🗑️ Excluir jogo")
+    if df.empty:
+        st.info("Nenhum jogo para excluir.")
+    else:
+        plataforma = st.selectbox("Plataforma", [""] + sorted(df["Plataforma"].dropna().unique()))
+        if plataforma:
+            console = st.selectbox("Console", sorted(df[df["Plataforma"] == plataforma]["Console"].dropna().unique()))
+            jogo = st.selectbox("Jogo", sorted(df[(df["Plataforma"] == plataforma) & (df["Console"] == console)]["Jogo"].dropna().unique()))
+            if st.button("Excluir jogo"):
+                df = df[~((df["Plataforma"] == plataforma) & (df["Console"] == console) & (df["Jogo"] == jogo))]
+                df.to_excel(ARQUIVO, index=False)
+                st.success("Jogo excluído com sucesso!")
+
+if pagina == "📋 Lista Completa":
+    st.subheader("📋 Lista completa de jogos")
+    if df.empty:
+        st.info("Nenhum jogo registrado.")
+    else:
+        df["Data de lançamento"] = pd.to_datetime(df["Data de lançamento"], errors="coerce").dt.strftime("%d/%m/%Y")
+        st.dataframe(df)
+
+if pagina == "📁 Backup e Importação":
+    st.subheader("📁 Backup e Importação")
+    buffer = BytesIO()
+    df.to_excel(buffer, index=False)
+    st.download_button("📥 Exportar Excel", buffer.getvalue(), "backup_jogos.xlsx", mime="application/vnd.ms-excel")
+
+    arquivo = st.file_uploader("📤 Importar planilha", type=["xlsx"])
+    if arquivo:
+        df = pd.read_excel(arquivo)
+        df.to_excel(ARQUIVO, index=False)
+        st.success("Planilha importada com sucesso!")
 
