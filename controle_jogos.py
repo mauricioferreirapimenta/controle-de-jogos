@@ -1,8 +1,3 @@
-# Arquivo FINAL .py com TODAS as funcionalidades + formatação de datas SEM HORA
-# Arquivo .py COMPLETO — TODAS as funcionalidades + TODAS as correções incluídas
-# Arquivo FINAL com todas as páginas, correções e datas formatadas corretamente
-# Geração completa disponível na próxima célula com toda a estrutura
-
 import streamlit as st
 import pandas as pd
 import os
